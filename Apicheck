@@ -1,0 +1,53 @@
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest;
+import org.json.JSONObject;
+
+
+public class Apicheck {
+	public static void main(String[]args) {
+		
+		        // Define the API endpoint URL
+		        String url = "https://api.coindesk.com/v1/bpi/currentprice.json"; 
+		        HttpClient client = HttpClient.newHttpClient();
+		        // Send GET request
+		        HttpRequest request = HttpRequest.newBuilder()
+		                .uri(URI.create(url))
+		                .build();
+
+		        try {
+		            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		            //Checking the status code
+		            if (response.statusCode() == 200) {
+
+		            	JSONObject data = new JSONObject(response.body());
+		                String json = data.toString();
+		                
+		                JSONObject data2 = new JSONObject(json);
+		                JSONObject bpi = data.getJSONObject("bpi");
+		                int bpilength=bpi.length();
+		                
+		                //Checking the length and description 
+		                if(bpilength==3) {
+		                	System.out.println("There are 3 currencies present");
+		                }
+		                else {
+		                	System.out.println("Mismatch in currencies");
+		                }
+		                JSONObject GBP=bpi.getJSONObject("GBP");
+		   
+		                String description = GBP.getString("description");
+		                if(description.equalsIgnoreCase("British Pound Sterling"))
+		                {
+		                	System.out.println("Currency matching description");
+		                }
+		                else {
+		                	System.out.println("Currency description is not matching");
+		                }
+		        }
+		        }catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }
+		}
