@@ -1,0 +1,40 @@
+import java.time.Duration;
+import java.util.Set;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class EbayCartCheck {
+
+		public static void main(String[] args) throws InterruptedException {
+			WebDriver driver= new ChromeDriver();
+			//Maximizing window
+			driver.manage().window().maximize();			
+			driver.get("http://ebay.com");
+			WebDriverWait wait= new WebDriverWait(driver, Duration.ofSeconds(5));
+			WebElement ele= driver.findElement(By.xpath("//*[@placeholder='Search for anything']"));
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@placeholder='Search for anything']")));
+			ele.click();
+			String currentWindow=driver.getWindowHandle();
+			ele.sendKeys("Books");	
+			driver.findElement(By.xpath("//*[@class='gh-search-button__label']")).click();
+			driver.findElement(By.xpath("//*[@id='srp-river-results']//*[@class='s-item__title'][1]")).click();
+			//Handling multiple window case
+			Set <String> s=driver.getWindowHandles();
+			for (String handle: s) {
+				   if (!handle.equals(currentWindow)) {
+				      driver.switchTo().window(handle);
+				   }
+				}
+			driver.findElement(By.xpath("//*[text()='Add to cart']")).click();
+			String cartValue= driver.findElement(By.xpath("//*[@class='badge']")).getText();
+			cartValue.equals("1");
+			System.out.println("Test Done");
+			Thread.sleep(5000);
+			driver.quit();
+	}
+
+}
